@@ -12,7 +12,18 @@ with gr.Blocks() as demo:
         gr.Markdown(""" init """)
     
     with gr.Tab("Deception"):
-        gr.Markdown(""" init """)
+            def ui(video):
+                result = video_identity(video)
+                if result: return "Authenticated"
+                return result
+
+            combined_ui = gr.Interface(
+                    fn=ui,
+                    inputs=gr.Video(),
+                    outputs="text",
+                    title="Deception Detection System",
+                    description="Displays the result of the input video to identify authenticity."
+            )
 
     with gr.Tab("Dataset"):
         gr.Markdown(""" init """)
