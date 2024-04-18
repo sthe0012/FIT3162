@@ -1,5 +1,14 @@
 import gradio as gr
 
+theme_code = {
+    "base": "dark",
+    "primary": "#ff6347",  # Tomato red for primary elements like buttons
+    "secondary": "#ff6347",  # Same color for secondary elements
+    "background": "#000000",  # Black background
+    "text_color": "#FFFFFF",  # Ensuring text is visible against the dark background
+    "font_family": "Arial"
+}
+
 # Start building the interface with Blocks
 with gr.Blocks() as demo:
     
