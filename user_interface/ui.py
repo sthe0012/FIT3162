@@ -12,6 +12,18 @@ with gr.Blocks() as demo:
         gr.Markdown(""" init """)
     
     with gr.Tab("Deception"):
+        
+        with gr.Tab("Real-time Camera Analysis"):
+            
+            def process_video(input):
+                return input
+            
+            gr.Markdown("""
+                        Unable to apply real-time camera at the moment.
+                        """)
+
+        with gr.Tab("Video Analysis"):
+            
             def ui(video):
                 result = video_identity(video)
                 if result: return "Authenticated"
