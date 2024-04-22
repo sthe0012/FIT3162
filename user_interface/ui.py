@@ -1,5 +1,9 @@
-import gradio as gr
+import io
 import pandas as pd
+import gradio as gr
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 theme_code = {
     "base": "dark",
@@ -73,15 +77,27 @@ with gr.Blocks(theme=theme_code) as demo:
 
         with gr.Tab("Video Analysis"):
             
+            def video_identify(video):
+                return np.random.random()
+        
             def ui(video):
-                result = video_identity(video)
-                if result: return "Authenticated"
-                return result
+                probability_of_authenticity = video_identity(video)
+                # Create a figure and axis
+                plt.figure()
+                # Create a bar graph
+                plt.bar(['Video'], [probability_of_authenticity], color='blue')
+                plt.ylim(0, 1)
+                plt.ylabel('Probability')
+                plt.title('Video Authenticity Check')
+                plt.grid(True)
+
+                # Gradio will now handle the figure directly
+                return plt.gcf(), f"Probability of Authenticity: {probability_of_authenticity:.2f}"
 
             combined_ui = gr.Interface(
                     fn=ui,
                     inputs=gr.Video(),
-                    outputs="text",
+                    outputs=["plot", "text"],  # Output both a plot and text
                     title="Deception Detection System",
                     description="Displays the result of the input video to identify authenticity."
             )
