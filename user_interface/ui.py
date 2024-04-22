@@ -121,13 +121,35 @@ with gr.Blocks(theme=theme_code) as demo:
         gr.Image("t2.jpg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
+                    "- **Name:** Shannon Theng\n"
+                    "- **Role:** Product Manager\n"
+                    "- **Email:** ..@student.monash.edu")
+        
+        gr.Image("t2.jpg", width=150, height=200)
+        gr.Markdown("### Contact Information\n"
+                    "Please contact us at:\n"
+                    "- **Name:** Jiahui\n"
                     "- **Role:** Quality Assurance\n"
-                    "- **Email:** example@email.com\n"
-                    "- **Phone:** +123456789")
+                    "- **Email:** ..@student.monash.edu")
+        
+        gr.Image("t2.jpg", width=150, height=200)
+        gr.Markdown("### Contact Information\n"
+                    "Please contact us at:\n"
+                    "- **Name:** Jasper\n"
+                    "- **Role:** Quality Assurance\n"
+                    "- **Email:** kaww0003@student.monash.edu")
+    
+        gr.Image("t2.jpg", width=150, height=200)
+        gr.Markdown("### Contact Information\n"
+                    "Please contact us at:\n"
+                    "- **Name:** Jing Wei\n"
+                    "- **Role:** Technical Lead\n"
+                    "- **Email:** jong0074@student.monash.edu")
         
         gr.Image("t5.jpg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
+                    "- **Name:** Jessie\n"
                     "- **Role:** Supervisor\n"
                     "- **Email:** leong.shumin@monash.edu\n"
                     "- **Phone:** +603-5516 1892")
