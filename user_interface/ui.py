@@ -81,7 +81,7 @@ with gr.Blocks(theme=theme_code) as demo:
                 return np.random.random()
         
             def ui(video):
-                probability_of_authenticity = video_identity(video)
+                probability_of_authenticity = video_identify(video)
                 # Create a figure and axis
                 plt.figure()
                 # Create a bar graph
