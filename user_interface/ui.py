@@ -78,26 +78,35 @@ with gr.Blocks(theme=theme_code) as demo:
         with gr.Tab("Video Analysis"):
             
             def video_identify(video):
-                return np.random.random()
+                return np.random.random(),np.random.random()
         
             def ui(video):
-                probability_of_authenticity = video_identify(video)
-                # Create a figure and axis
+                probability_of_authenticity, data_for_line_graph = video_identify(video)
+                
+                # Create the bar graph
                 plt.figure()
-                # Create a bar graph
                 plt.bar(['Video'], [probability_of_authenticity], color='blue')
                 plt.ylim(0, 1)
                 plt.ylabel('Probability')
-                plt.title('Video Authenticity Check')
+                plt.title('Action Unit Trigger')
                 plt.grid(True)
+                bar_graph = plt.gcf()  # Get the current figure to return to Gradio
+                
+                # Create the line graph
+                plt.figure()
+                plt.plot(data_for_line_graph, marker='o', linestyle='-', color='red')
+                plt.title('Gaze Prediction')
+                plt.xlabel('Time')
+                plt.ylabel('Metric')
+                plt.grid(True)
+                line_graph = plt.gcf()  # Get the current figure to return to Gradio
 
-                # Gradio will now handle the figure directly
-                return plt.gcf(), f"Probability of Authenticity: {probability_of_authenticity:.2f}"
+                return bar_graph, line_graph, f"Probability of Authenticity: {probability_of_authenticity:.2f}"
 
             combined_ui = gr.Interface(
                     fn=ui,
                     inputs=gr.Video(),
-                    outputs=["plot", "text"],  # Output both a plot and text
+                    outputs=["plot", "plot", "text"],  # Output both a plot and text
                     title="Deception Detection System",
                     description="Displays the result of the input video to identify authenticity."
             )
