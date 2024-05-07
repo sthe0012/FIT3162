@@ -1,9 +1,16 @@
 import io
+import os
+import sys
+import glob
+import csv
 import pandas as pd
 import gradio as gr
-import matplotlib.pyplot as plt
 import numpy as np
-
+import numpy as np
+from os import walk
+from os.path import join
+from os.path import splitext
+import matplotlib.pyplot as plt
 
 theme_code = {
     "base": "dark",
@@ -14,8 +21,22 @@ theme_code = {
     "font_family": "Arial"
 }
 
+def count_dataset()->int:
+    total = 0
+    total += count_trained_data_real_life()
+    
+    return total
+
+
+def count_trained_data_real_life():
+        total = 0
+        path = 'dataset_1\Real-life_Deception_Detection_2016\Annotation\All_Gestures_Deceptive_and_Truthful.csv'
+        data = pd.read_csv(path)
+        total += len(data)        
+        return total
+
 # Start building the interface with Blocks
-with gr.Blocks(theme=theme_code) as demo:
+with gr.Blocks(theme=theme_code) as mcs4ui:
 
     gr.Markdown(""" # MCS4 - Securing Face ID """)
     
@@ -74,7 +95,6 @@ with gr.Blocks(theme=theme_code) as demo:
                         Unable to apply real-time camera at the moment.
                         """)
 
-
         with gr.Tab("Video Analysis"):
             
             def video_identify(video):
@@ -122,17 +142,9 @@ with gr.Blocks(theme=theme_code) as demo:
             """)
 
     with gr.Tab("Dataset"):
-        
-        def count_trained_data():
-            total = 0
-            path = 'dataset_1\Real-life_Deception_Detection_2016\Annotation\All_Gestures_Deceptive_and_Truthful.csv'
-            data = pd.read_csv(path)
-            total += len(data)
-            
-            return total
-            
+                    
         gr.Interface(
-            fn = count_trained_data,
+            fn = count_dataset,
             inputs=None,
             outputs="text",
             title="Datasets",
@@ -180,6 +192,6 @@ with gr.Blocks(theme=theme_code) as demo:
                     "- **Phone:** +603-5516 1892")
 
         
-        
-# Launch the demo interface
-demo.launch()
+    
+if __name__ == '__main__':
+    mcs4ui.launch()
