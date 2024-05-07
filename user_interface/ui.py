@@ -23,10 +23,8 @@ theme_code = {
 
 def count_dataset()->int:
     total = 0
-    total += count_trained_data_real_life()
-    
+    total += count_trained_data_real_life()    
     return total
-
 
 def count_trained_data_real_life():
         total = 0
@@ -83,7 +81,6 @@ with gr.Blocks(theme=theme_code) as mcs4ui:
         
         """)
 
-    
     with gr.Tab("Deception"):
         
         with gr.Tab("Real-time Camera Analysis"):
