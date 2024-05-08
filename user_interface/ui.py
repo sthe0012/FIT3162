@@ -3,14 +3,16 @@ import os
 import sys
 import glob
 import csv
+import cv2
+import time
 import pandas as pd
 import gradio as gr
-import numpy as np
 import numpy as np
 from os import walk
 from os.path import join
 from os.path import splitext
 import matplotlib.pyplot as plt
+from transformers import pipeline
 
 theme_code = {
     "base": "dark",
@@ -28,7 +30,7 @@ def count_dataset()->int:
 
 def count_trained_data_real_life():
         total = 0
-        path = 'dataset_1\Real-life_Deception_Detection_2016\Annotation\All_Gestures_Deceptive_and_Truthful.csv'
+        path = 'D:\fit3162\dataset\Real-life_Deception_Detection_2016\Annotation\All_Gestures_Deceptive_and_Truthful.csv'
         data = pd.read_csv(path)
         total += len(data)        
         return total
@@ -95,6 +97,7 @@ with gr.Blocks(theme=theme_code) as mcs4ui:
         with gr.Tab("Video Analysis"):
             
             def video_identify(video):
+                if video is None: gr.Error("Input is empty")
                 return np.random.random(),np.random.random()
         
             def ui(video):
