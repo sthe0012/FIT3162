@@ -223,10 +223,10 @@ with gr.Blocks() as mcs4ui:
             5. The result will appear in output section indicating truthfulness.
             """)
 
-        with gr.Tab("Real-time Camera Analysis"):            
-            gr.Markdown("""
-                        Unable to apply real-time camera at the moment.
-                        """)
+        # with gr.Tab("Real-time Camera Analysis"):            
+        #     gr.Markdown("""
+        #                 Unable to apply real-time camera at the moment.
+        #                 """)
 
     with gr.Tab("Dataset"):
                     
