@@ -5,14 +5,16 @@ import glob
 import csv
 import cv2
 import time
-import pandas as pd
+import joblib
 import gradio as gr
+import pandas as pd
 import numpy as np
 from os import walk
 from os.path import join
 from os.path import splitext
 import matplotlib.pyplot as plt
 from transformers import pipeline
+from scipy.signal import resample
 
 theme_code = {
     "base": "dark",
@@ -22,6 +24,75 @@ theme_code = {
     "text_color": "#FFFFFF",  # Ensuring text is visible against the dark background
     "font_family": "Arial"
 }
+
+def old_fx(video):
+                result = video_identify(video)
+                
+                # Create the bar graph
+                plt.figure()
+                plt.bar(['Video'], [probability_of_authenticity], color='blue')
+                plt.ylim(0, 1)
+                plt.ylabel('Probability')
+                plt.title('Action Unit Trigger')
+                plt.grid(True)
+                bar_graph = plt.gcf()  # Get the current figure to return to Gradio
+                
+                # Create the line graph
+                plt.figure()
+                plt.plot(data_for_line_graph, marker='o', linestyle='-', color='red')
+                plt.title('Gaze Prediction')
+                plt.xlabel('Time')
+                plt.ylabel('Metric')
+                plt.grid(True)
+                line_graph = plt.gcf()  # Get the current figure to return to Gradio
+
+def pre_processing(input):
+    cols_to_drop = ["frame", "Unnamed: 0", "label", "face_id", "timestamp", "confidence", "success"]
+    processed_file = input.drop([col for col in cols_to_drop if col in input.columns], axis=1).drop_duplicates()
+    processed_file = np.array(processed_file)
+    return processed_file
+
+def predict_inp(model, gaze_path, mexp_path, max_columns=576):
+    
+    # read csv
+    csv_gaze, csv_mexp = pd.read_csv(gaze_path), pd.read_csv(mexp_path)
+    
+    # filter csv attributes
+    gaze_data_clean, mexp_data_clean = pre_processing(csv_gaze), pre_processing(csv_mexp)
+    
+    # resample consistent samples
+    gaze_data_resampled,mexp_data_resampled = resample(gaze_data_clean, 300),resample(mexp_data_clean, 300)
+    
+    # multimodal features (gaze, mexp)
+    combined_features = np.hstack([gaze_data_resampled, mexp_data_resampled])
+    
+    print("Gaze data shape:", gaze_data_resampled.shape)
+    print("MEXP data shape:", mexp_data_resampled.shape)
+    print("Combined features shape:", combined_features.shape)
+    #print("Final input features shape:", new_data_vector.shape)
+
+
+    # Adjust to the maximum column count used in training data
+    if current_columns > max_columns:
+        combined_features = combined_features[:, :max_columns]  # Ensure it does not exceed max_columns
+    elif current_columns < max_columns:
+        additional_columns = max_columns - current_columns
+        empty_columns = np.zeros((combined_features.shape[0], additional_columns))
+        combined_features = np.hstack([combined_features, empty_columns])
+
+
+    # Flatten the features into a single vector
+    new_data_vector = combined_features.flatten().reshape(1, -1)
+
+    # Check for NaN values and ensure the input data is valid
+    valid_indices = ~np.isnan(new_data_vector).any(axis=1)
+    new_data_vector_clean = new_data_vector[valid_indices]
+
+    # Make a prediction using the trained model pipeline
+    prediction = model.predict(new_data_vector_clean)
+
+    # Output the prediction
+    return 1 if prediction == 0 else 0  
 
 def count_dataset()->int:
     total = 0
@@ -35,6 +106,11 @@ def count_trained_data_real_life():
         data = pd.read_csv(path)
         total += len(data)        
         return total
+
+def get_model():
+    #D:\fit3162\project\FIT3162
+    model = joblib.load('multimodal_mexp_and_gaze.pkl')
+    return model
 
 # Start building the interface with Blocks
 with gr.Blocks(theme=theme_code) as mcs4ui:
@@ -86,44 +162,30 @@ with gr.Blocks(theme=theme_code) as mcs4ui:
 
     with gr.Tab("Deception"):
         
-        # with gr.Tab("Real-time Camera Analysis"):            
-        #     gr.Markdown("""
-        #                 Unable to apply real-time camera at the moment.
-        #                 """)
-
         with gr.Tab("Video Analysis"):
             
             def video_identify(video):
-                if video is None: return gr.Error("Input is empty")
-                return np.random.random(),np.random.random()
+                
+                # validation
+                # if video is None: return gr.Error("Input is empty")
+                # if not isinstance(video, str) or not video.lower().endswith('.mp4'): return gr.Error("Input must be an .mp4 file")
+
+                # generate csv file (mexp & gaze)
+                gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_005.csv"
+                mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_005.csv"
+                
+                trained_model = get_model()
+                result = predict_inp(trained_model, gaze_file, mexp_file)
+                return "Truthful" if result == 0 else "Deceptive"
         
             def ui(video):
-                probability_of_authenticity, data_for_line_graph = video_identify(video)
-                
-                # Create the bar graph
-                plt.figure()
-                plt.bar(['Video'], [probability_of_authenticity], color='blue')
-                plt.ylim(0, 1)
-                plt.ylabel('Probability')
-                plt.title('Action Unit Trigger')
-                plt.grid(True)
-                bar_graph = plt.gcf()  # Get the current figure to return to Gradio
-                
-                # Create the line graph
-                plt.figure()
-                plt.plot(data_for_line_graph, marker='o', linestyle='-', color='red')
-                plt.title('Gaze Prediction')
-                plt.xlabel('Time')
-                plt.ylabel('Metric')
-                plt.grid(True)
-                line_graph = plt.gcf()  # Get the current figure to return to Gradio
-
-                return bar_graph, line_graph, f"Probability of Authenticity: {probability_of_authenticity:.2f}"
+                result = video_identify(video)
+                return f"Probability of Authenticity: {result:.2f}"
 
             combined_ui = gr.Interface(
                     fn=ui,
                     inputs=gr.Video(),
-                    outputs=["plot", "plot", "text"],  # Output both a plot and text
+                    outputs=["text"],  # Output both a plot and text
                     title="Deception Detection System",
                     description="Displays the result of the input video to identify authenticity."
             )
@@ -137,6 +199,11 @@ with gr.Blocks(theme=theme_code) as mcs4ui:
             4. Wait for the result.
             5. The result will appear in output section indicating truthfulness.
             """)
+
+        with gr.Tab("Real-time Camera Analysis"):            
+            gr.Markdown("""
+                        Unable to apply real-time camera at the moment.
+                        """)
 
     with gr.Tab("Dataset"):
                     
