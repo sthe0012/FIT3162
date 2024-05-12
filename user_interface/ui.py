@@ -16,6 +16,21 @@ import matplotlib.pyplot as plt
 from transformers import pipeline
 from scipy.signal import resample
 
+def count_gender_distribution():
+    csv_path = r"D:\\fit3162\project\FIT3162\dataset_file\\gender_bias_trial_data_results.csv" 
+    gender_bias_file = pd.read_csv(csv_path)
+    
+    # Extract gender and video count data
+    gender = gender_bias_file['Gender']
+    video_count = gender_bias_file['Video_Count']
+    
+    # Plotting the pie chart
+    fig, ax = plt.subplots()
+    ax.pie(video_count, labels=gender, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Equal aspect ratio ensures that the pie is drawn as a circle.
+    
+    return fig
+
 def old_fx(video):
                 result = video_identify(video)
                 
@@ -105,7 +120,7 @@ def get_model():
     return model
 
 # Start building the interface with Blocks
-with gr.Blocks(theme=theme_code) as mcs4ui:
+with gr.Blocks() as mcs4ui:
 
     gr.Markdown(""" # MCS4 - Securing Face ID """)
     
@@ -200,12 +215,18 @@ with gr.Blocks(theme=theme_code) as mcs4ui:
     with gr.Tab("Dataset"):
                     
         gr.Interface(
-            fn = count_dataset,
+            fn = count_gender_distribution,
             inputs=None,
-            outputs="text",
-            title="Datasets",
-            description="The total of dataset that has trained"
+            outputs="plot",
+            title="Gender Bias Distribution"
         )
+        
+        gr.Markdown("""
+            The graph has showed the overall percentages of gender bias to train the model.
+            It has showed the gender bias distribution to allow users to visualise the 
+            gender distribution (Latest updated: 13/5/2024)
+                    """)
+        
     
     with gr.Tab("Contact"):
         
