@@ -16,8 +16,30 @@ import matplotlib.pyplot as plt
 from transformers import pipeline
 from scipy.signal import resample
 
+def count_training_distribution():
+    
+    csv_list = {
+        r"dataset_file\\Annotation_mexp_features.csv",
+        r"dataset_file\\Annotation_gaze_features.csv"    
+    }
+    all_labels = []
+    
+    for file in csv_list:
+        current_file = pd.read_csv(file)
+        all_labels.append(current_file['label'])
+    
+    combined_labels = pd.concat(all_labels, ignore_index=True)
+    label_counts = combined_labels.value_counts()
+    
+    # Plotting the pie chart
+    fig, ax = plt.subplots()
+    ax.pie(label_counts, labels=label_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen'])
+    ax.axis('equal')
+    ax.set_title('Label Distribution')
+    return fig
+        
 def count_gender_distribution():
-    csv_path = r"D:\\fit3162\project\FIT3162\dataset_file\\gender_bias_trial_data_results.csv" 
+    csv_path = r"dataset_file\\gender_bias_trial_data_results.csv" 
     gender_bias_file = pd.read_csv(csv_path)
     
     # Extract gender and video count data
@@ -225,6 +247,19 @@ with gr.Blocks() as mcs4ui:
             The graph has showed the overall percentages of gender bias to train the model.
             It has showed the gender bias distribution to allow users to visualise the 
             gender distribution (Latest updated: 13/5/2024)
+                    """)
+
+        gr.Interface(
+            fn=count_training_distribution,
+            inputs=None,
+            outputs="plot",
+            title="Training Data Distribution",
+        )
+        
+        gr.Markdown("""
+            The graph has showed the overall percentages of deceptive and truthful data to train the model.
+            It has showed the label distribution to allow users to visualise the 
+            percentages of real and deceptive distribution (Latest update: 13/5/2024)
                     """)
         
     
