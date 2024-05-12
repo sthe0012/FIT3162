@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 from transformers import pipeline
 from scipy.signal import resample
 
+def compute_accuracy():
+    pass
+
 def count_training_distribution():
     
     csv_list = {
@@ -125,19 +128,10 @@ def predict_inp(model, gaze_path, mexp_path, max_columns=576):
 
 def count_dataset()->int:
     total = 0
-    total += count_trained_data_real_life()    
+    total += 121 
     return total
 
-def count_trained_data_real_life():
-        total = 0
-        path = r"D:\fit3162\dataset\Real-life_Deception_Detection_2016\Annotation\All_Gestures_Deceptive_and_Truthful.csv"
-        #path = 'D:\fit3162\dataset\Real-life_Deception_Detection_2016\Annotation\All_Gestures_Deceptive_and_Truthful.csv'
-        data = pd.read_csv(path)
-        total += len(data)        
-        return total
-
 def get_model():
-    #D:\fit3162\project\FIT3162
     model = joblib.load('multimodal_mexp_and_gaze.pkl')
     return model
 
@@ -261,6 +255,20 @@ with gr.Blocks() as mcs4ui:
             It has showed the label distribution to allow users to visualise the 
             percentages of real and deceptive distribution (Latest update: 13/5/2024)
                     """)
+
+        gr.Interface(
+            fn=count_dataset,
+            inputs=None,
+            outputs="text",
+            title="Total data trained to build the model"
+        )
+        
+        gr.Interface(
+            fn=compute_accuracy,
+            inputs=None,
+            outputs="text",
+            title="Overall Deceptive Detection System Accuracy "
+        )
         
     
     with gr.Tab("Contact"):
