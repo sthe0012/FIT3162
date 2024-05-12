@@ -16,15 +16,6 @@ import matplotlib.pyplot as plt
 from transformers import pipeline
 from scipy.signal import resample
 
-theme_code = {
-    "base": "dark",
-    "primary": "#ff6347",  # Tomato red for primary elements like buttons
-    "secondary": "#ff6347",  # Same color for secondary elements
-    "background": "#000000",  # Black background
-    "text_color": "#FFFFFF",  # Ensuring text is visible against the dark background
-    "font_family": "Arial"
-}
-
 def old_fx(video):
                 result = video_identify(video)
                 
@@ -56,30 +47,31 @@ def predict_inp(model, gaze_path, mexp_path, max_columns=576):
     
     # read csv
     csv_gaze, csv_mexp = pd.read_csv(gaze_path), pd.read_csv(mexp_path)
-    
     # filter csv attributes
     gaze_data_clean, mexp_data_clean = pre_processing(csv_gaze), pre_processing(csv_mexp)
-    
     # resample consistent samples
     gaze_data_resampled,mexp_data_resampled = resample(gaze_data_clean, 300),resample(mexp_data_clean, 300)
-    
     # multimodal features (gaze, mexp)
     combined_features = np.hstack([gaze_data_resampled, mexp_data_resampled])
+
+    adjusted_combined_data = {}
     
-    print("Gaze data shape:", gaze_data_resampled.shape)
-    print("MEXP data shape:", mexp_data_resampled.shape)
-    print("Combined features shape:", combined_features.shape)
-    #print("Final input features shape:", new_data_vector.shape)
+    for key, data in combined_data.items():
+        current_columns = data.shape[1]
+        if current_columns < max_columns:
+            # Calculate how many columns to add
+            additional_columns = max_columns - current_columns
+            
+            # Create an array of NaNs to add
+            empty_columns = np.zeros((combined_features.shape[0], additional_columns))  # Change from np.nan to np.zeros
+            
+            # Concatenate the original data with the new empty columns
+            new_data = np.hstack([data, empty_columns])
+        else:
+            new_data = data
 
-
-    # Adjust to the maximum column count used in training data
-    if current_columns > max_columns:
-        combined_features = combined_features[:, :max_columns]  # Ensure it does not exceed max_columns
-    elif current_columns < max_columns:
-        additional_columns = max_columns - current_columns
-        empty_columns = np.zeros((combined_features.shape[0], additional_columns))
-        combined_features = np.hstack([combined_features, empty_columns])
-
+        # Store the adjusted data back into the dictionary
+        adjusted_combined_data[key] = new_data
 
     # Flatten the features into a single vector
     new_data_vector = combined_features.flatten().reshape(1, -1)
