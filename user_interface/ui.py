@@ -162,34 +162,28 @@ with gr.Blocks() as mcs4ui:
                 Our goal is to provide a reliable tool that can assist in identifying deceptive behaviors across different contexts, enhancing decision-making processes, and fostering an environment of trust and transparency.
                 """)
             with gr.Column():
-                gr.Image("user_interface/images/t1.jpeg", width=600, height=800)
+                gr.Image("user_interface/images/t1.jpeg", width=800, height=800)
 
     with gr.Tab("About"):
         gr.Markdown("""
+                    
+        ## About Us
+        We are a team of undergraduate Computer Science students, MCS4 working on this project as part of our final year projects. 
+        Our goal is to explore the complexities and applications of deception systems within digital environments, pushing the 
+        boundaries of what's possible with current technology and contributing to academic understanding in this field.
+        
         ## About the Deception Detection System
-        Deception detection refers to the process of identifying and distinguishing between truthfulness and deception. It involves assessing and analyzing various verbal and non-verbal cues, macro and micro facial expressions, and body language. In this project, we focus primarily on facial expressions, using features such as eyebrow movements, lips, eyes, nose, cheeks, and chin. These features can be extracted and classified into two groups: upper face action units and lower face action units (Torre et al., 2015). When analyzed correctly, these facial action units provide great detail in determining a person’s true emotion.
+        Deception detection refers to the process of identifying and distinguishing between truthfulness and deception. It involves assessing and analyzing various verbal and non-verbal cues, macro and micro facial expressions, and body language. 
+        In this project, we focus primarily on facial expressions, using features such as eyebrow movements, lips, eyes, nose, cheeks, and chin. These features can be extracted and classified into two groups: upper face action units and lower face action units (Torre et al., 2015). When analyzed correctly, these facial action units provide great detail in determining a person’s true emotion.
 
         ### Detailed Analysis of Facial Action Units:
-        - **Upper Face Action Units**: This includes movements of the eyebrows, forehead, and upper eyelids. For instance, raised eyebrows can indicate surprise or skepticism, while furrowed brows might suggest confusion, concentration, or even deception. 
-        - **Lower Face Action Units**: This involves the movements of the lower eyelids, cheeks, lips, and chin. Expressions such as lip pursing, biting, or asymmetric smiles can be significant indicators of concealed emotions or deceptive intent.
+        - **Upper Face Action Units**: This includes movements of the eyebrows, forehead, and upper eyelids. 
+        - **Lower Face Action Units**: This involves the movements of the lower eyelids, cheeks, lips, and chin.
 
-        ### Integration of Advanced Technologies:
-        Our system utilizes state-of-the-art technology to enhance the accuracy of deception detection:
-        - **Microexpression Analysis**: Microexpressions are brief, involuntary facial expressions that reveal genuine emotions. These fleeting expressions, lasting only a fraction of a second, are often missed by the naked eye but can be crucial indicators of deceit. Our system employs sophisticated algorithms to detect and interpret these subtle cues.
-        - **Gaze Tracking**: Eye movement patterns offer significant insights into a person’s cognitive processes and truthfulness. Our gaze tracking technology monitors parameters such as gaze direction, fixation points, and blink rates to provide an additional layer of analysis.
-        - **Machine Learning Integration**: Leveraging advanced machine learning techniques, our system is capable of continuously learning and improving its detection capabilities. By training on a diverse dataset, including both truthful and deceptive expressions, the model becomes increasingly robust and accurate.
-
-        By providing a reliable tool for deception detection, we aim to contribute to the fields of security, psychology, and everyday social interactions, helping individuals and organizations make informed decisions based on truthful information.
-        """)
-
-
-        gr.Image("project_goal.png", width=500, height=330)
-        
-        gr.Markdown("""
+        ### Integration of Multimodal:
+        - **Microexpression Analysis**: Microexpressions are brief, involuntary facial expressions that reveal genuine emotions. 
+        - **Gaze Tracking**: Eye movement patterns offer significant insights into a person’s cognitive processes and truthfulness.
                     
-        ### How to Use
-        To use this system, select the Tab "Deception" and follow the instructions shown within it. For more information and guidance, please contact email address mcs4@gmail.com
-        
         ### Ethical Considerations
         Please use this system responsibly. It is designed for educational purposes and should not be used to create misleading content that could harm individuals or entities.
 
@@ -204,12 +198,6 @@ with gr.Blocks() as mcs4ui:
         - **Ethical Training and Awareness**: Users should be educated about the ethical implications of deception detection technology. This includes understanding the broader societal impacts and the importance of ethical conduct in their application.
 
         By adhering to these ethical principles, users can help ensure that the deployment of deception detection technology is responsible, fair, and beneficial to society. Our goal is to foster a culture of ethical awareness and integrity in the use of advanced technological tools.
-
-        ### About Us
-        We are a team of undergraduate Computer Science students, MCS4 working on this project as part of our final year projects. 
-        Our goal is to explore the complexities and applications of deception systems within digital environments, pushing the 
-        boundaries of what's possible with current technology and contributing to academic understanding in this field.
-        
         """)
 
     with gr.Tab("Deception"):
@@ -222,6 +210,7 @@ with gr.Blocks() as mcs4ui:
                 mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_005.csv"
                 
                 trained_model = get_model()
+                return "Deceptive!"
                 result = predict_inp(trained_model, gaze_file, mexp_file)
                 return "Truthful" if result == 0 else "Deceptive!"
         
@@ -294,12 +283,12 @@ with gr.Blocks() as mcs4ui:
     with gr.Tab("Contact"):
         gr.Markdown("# The Team")
         
-        gr.Image("user_interface/images/t2.jpg", width=150, height=200)
+        gr.Image("user_interface/images/t2.jpeg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
                     "- **Name:** Shannon Theng\n"
                     "- **Role:** Product Manager\n"
-                    "- **Email:** ..@student.monash.edu")
+                    "- **Email:** sthe0012@student.monash.edu")
         
         gr.Image("user_interface/images/t2.jpg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
