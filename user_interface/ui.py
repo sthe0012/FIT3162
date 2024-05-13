@@ -145,36 +145,65 @@ with gr.Blocks() as mcs4ui:
             with gr.Column(): 
                 gr.Markdown("# Start Detecting Deceptions With Uploading A Video")
                 gr.Markdown("""
-                            Deception prevails in many forms in society and can be broadly
-                            categorized as deception in high-risk environments and incidental
-                            deception.
-                            """)
+                Deception can manifest in various forms within society. It can be broadly classified into two categories:
+
+                **High-Risk Environments**: Situations where deception can lead to significant consequences. These include criminal investigations, national security matters, corporate fraud, and any scenario where truthfulness is critical to the outcome. In these high-stakes settings, the ability to accurately detect deception can be crucial for making informed decisions, ensuring justice, and maintaining security.
+
+                **Incidental Deception**: Everyday situations where deception may occur with lesser impact. This includes social interactions, personal relationships, and minor disputes. Although the consequences of deception in these contexts are generally less severe, understanding and identifying deceptive behavior can still play a vital role in improving communication, trust, and overall social dynamics.
+
+                Our advanced deception detection system leverages cutting-edge technology to analyze microexpressions and gaze patterns. By integrating data from these two modalities, our system can provide a comprehensive assessment of an individual's veracity. This multi-faceted approach ensures higher accuracy and reliability in detecting deceptive behaviors.
+
+                ### Key Features:
+                **Microexpression Analysis**: Microexpressions are brief, involuntary facial expressions that reveal genuine emotions. Our system is trained to recognize these subtle cues, which are often missed by the human eye.
+                **Gaze Tracking**: Eye movement patterns can offer significant insights into a person's cognitive processes and truthfulness. By monitoring and analyzing gaze direction, fixation points, and blink rates, our system adds another layer of scrutiny to the deception detection process.
+                **Machine Learning Integration**: Our system employs advanced machine learning algorithms, including support vector machines (SVM), to continuously improve detection accuracy. The model is trained on a diverse dataset to ensure robustness across various scenarios.
+                **User-Friendly Interface**: Upload a video to start detecting deceptions effortlessly. The intuitive design allows users to navigate and utilize the system with ease, making it accessible for both professionals and non-experts alike.
+
+                Our goal is to provide a reliable tool that can assist in identifying deceptive behaviors across different contexts, enhancing decision-making processes, and fostering an environment of trust and transparency.
+                """)
             with gr.Column():
-                gr.Image("user_interface/images/t1.png", width=800, height=500)
+                gr.Image("user_interface/images/t1.jpeg", width=600, height=800)
 
     with gr.Tab("About"):
         gr.Markdown("""
-        ## About the Deception System
-        Deception detection refers to the process of identifying and distinguishing between truthfulness and deception. 
-        It involves assessing and analysing various verbal and non-verbal cues, macro and micro facial expressions, and 
-        body language. In this project, we will mainly be dealing with facial expressions and using features such as a 
-        person’s eyebrow movement, lips, eyes, nose, cheeks, and chin. These features can be extracted and classified 
-        into two groups, upper face action units and lower face action units (Torre et al., 2015). These facial action 
-        units when analysed correctly, provide great detail in determining a person’s true emotion.
+        ## About the Deception Detection System
+        Deception detection refers to the process of identifying and distinguishing between truthfulness and deception. It involves assessing and analyzing various verbal and non-verbal cues, macro and micro facial expressions, and body language. In this project, we focus primarily on facial expressions, using features such as eyebrow movements, lips, eyes, nose, cheeks, and chin. These features can be extracted and classified into two groups: upper face action units and lower face action units (Torre et al., 2015). When analyzed correctly, these facial action units provide great detail in determining a person’s true emotion.
+
+        ### Detailed Analysis of Facial Action Units:
+        - **Upper Face Action Units**: This includes movements of the eyebrows, forehead, and upper eyelids. For instance, raised eyebrows can indicate surprise or skepticism, while furrowed brows might suggest confusion, concentration, or even deception. 
+        - **Lower Face Action Units**: This involves the movements of the lower eyelids, cheeks, lips, and chin. Expressions such as lip pursing, biting, or asymmetric smiles can be significant indicators of concealed emotions or deceptive intent.
+
+        ### Integration of Advanced Technologies:
+        Our system utilizes state-of-the-art technology to enhance the accuracy of deception detection:
+        - **Microexpression Analysis**: Microexpressions are brief, involuntary facial expressions that reveal genuine emotions. These fleeting expressions, lasting only a fraction of a second, are often missed by the naked eye but can be crucial indicators of deceit. Our system employs sophisticated algorithms to detect and interpret these subtle cues.
+        - **Gaze Tracking**: Eye movement patterns offer significant insights into a person’s cognitive processes and truthfulness. Our gaze tracking technology monitors parameters such as gaze direction, fixation points, and blink rates to provide an additional layer of analysis.
+        - **Machine Learning Integration**: Leveraging advanced machine learning techniques, our system is capable of continuously learning and improving its detection capabilities. By training on a diverse dataset, including both truthful and deceptive expressions, the model becomes increasingly robust and accurate.
+
+        By providing a reliable tool for deception detection, we aim to contribute to the fields of security, psychology, and everyday social interactions, helping individuals and organizations make informed decisions based on truthful information.
         """)
+
 
         gr.Image("project_goal.png", width=500, height=330)
         
         gr.Markdown("""
                     
         ### How to Use
-        To use this system, select the Tab "Deception" and follow the instructions shown within it.
+        To use this system, select the Tab "Deception" and follow the instructions shown within it. For more information and guidance, please contact email address mcs4@gmail.com
         
         ### Ethical Considerations
         Please use this system responsibly. It is designed for educational purposes and should not be used to create misleading content that could harm individuals or entities.
 
-        ### Technical Details
-        The system uses SVM machine learning models to generate and analyze deceptive patterns in digital media.
+        Deception detection technology, while powerful, carries significant ethical implications. The following points outline important considerations to ensure the responsible use of our system:
+
+        - **Respect for Privacy**: The use of this system should always respect the privacy and consent of individuals being analyzed. Unauthorized use or covert recording without explicit consent is unethical and potentially illegal.
+        - **Accuracy and Misinterpretation**: While our system is designed to be as accurate as possible, no technology is infallible. There is always a risk of false positives or false negatives. Users should be cautious in interpreting results and avoid making definitive judgments solely based on the system’s output.
+        - **Purpose and Context**: The system is intended for educational and research purposes. It should not be used as a sole determinant in critical decisions, such as legal judgments, hiring processes, or personal relationships. Context is crucial, and the technology should be one of many tools used in a comprehensive evaluation process.
+        - **Avoiding Harm**: The misuse of deception detection technology can lead to significant harm, including wrongful accusations, invasion of privacy, and erosion of trust. Users must consider the potential consequences of their actions and strive to minimize any negative impact.
+        - **Transparency and Accountability**: Users of the system should be transparent about their use of the technology and be accountable for its application. This includes clearly communicating the limitations and intended use of the system to all stakeholders involved.
+        - **Bias and Fairness**: Efforts should be made to ensure that the system is free from biases that could disproportionately affect certain groups. This involves continuous evaluation and improvement of the algorithms to address any detected biases.
+        - **Ethical Training and Awareness**: Users should be educated about the ethical implications of deception detection technology. This includes understanding the broader societal impacts and the importance of ethical conduct in their application.
+
+        By adhering to these ethical principles, users can help ensure that the deployment of deception detection technology is responsible, fair, and beneficial to society. Our goal is to foster a culture of ethical awareness and integrity in the use of advanced technological tools.
 
         ### About Us
         We are a team of undergraduate Computer Science students, MCS4 working on this project as part of our final year projects. 
@@ -188,27 +217,23 @@ with gr.Blocks() as mcs4ui:
         with gr.Tab("Video Analysis"):
             
             def video_identify(video):
-                
-                # validation
-                # if video is None: return gr.Error("Input is empty")
-                # if not isinstance(video, str) or not video.lower().endswith('.mp4'): return gr.Error("Input must be an .mp4 file")
-
                 # generate csv file (mexp & gaze)
                 gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_005.csv"
                 mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_005.csv"
                 
                 trained_model = get_model()
                 result = predict_inp(trained_model, gaze_file, mexp_file)
-                return "Truthful" if result == 0 else "Deceptive"
+                return "Truthful" if result == 0 else "Deceptive!"
         
             def ui(video):
-                result = video_identify(video)
-                return f"Probability of Authenticity: {result:.2f}"
+                if video is None: return "Please upload a file."
+                elif not video.lower().endswith('.mp4'): return "Please upload a file with file type MP4 strictly"
+                else: return video_identify(video)
 
             combined_ui = gr.Interface(
                     fn=ui,
                     inputs=gr.Video(),
-                    outputs=["text"],  # Output both a plot and text
+                    outputs=["text"],
                     title="Deception Detection System",
                     description="Displays the result of the input video to identify authenticity."
             )
@@ -216,17 +241,12 @@ with gr.Blocks() as mcs4ui:
         gr.Markdown("""       
             Steps: 
             
-            1. Select different tab of Real-time Camera Analysis or Video Analysis.
+            1. Select different tab of Real-time Camera Analysis (unavailable) or Video Analysis.
             2. Select a video or upload a video at the video input.
             3. Click Submit button.
             4. Wait for the result.
             5. The result will appear in output section indicating truthfulness.
             """)
-
-        # with gr.Tab("Real-time Camera Analysis"):            
-        #     gr.Markdown("""
-        #                 Unable to apply real-time camera at the moment.
-        #                 """)
 
     with gr.Tab("Dataset"):
                     
@@ -272,7 +292,6 @@ with gr.Blocks() as mcs4ui:
         
     
     with gr.Tab("Contact"):
-        
         gr.Markdown("# The Team")
         
         gr.Image("user_interface/images/t2.jpg", width=150, height=200)
@@ -285,28 +304,28 @@ with gr.Blocks() as mcs4ui:
         gr.Image("user_interface/images/t2.jpg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
-                    "- **Name:** Jiahui\n"
+                    "- **Name:** Jiahui Yin\n"
                     "- **Role:** Quality Assurance\n"
                     "- **Email:** ..@student.monash.edu")
         
-        gr.Image("user_interface/images/t2.jpg", width=150, height=200)
+        gr.Image("user_interface/images/t3.jpeg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
-                    "- **Name:** Jasper\n"
+                    "- **Name:** Kai Le Aw\n"
                     "- **Role:** Quality Assurance\n"
                     "- **Email:** kaww0003@student.monash.edu")
     
-        gr.Image("user_interface/images/t2.jpg", width=150, height=200)
+        gr.Image("user_interface/images/t4.jpeg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
-                    "- **Name:** Jing Wei\n"
+                    "- **Name:** Jing Wei Ong\n"
                     "- **Role:** Technical Lead\n"
                     "- **Email:** jong0074@student.monash.edu")
         
         gr.Image("user_interface/images/t5.jpg", width=150, height=200)
         gr.Markdown("### Contact Information\n"
                     "Please contact us at:\n"
-                    "- **Name:** Jessie\n"
+                    "- **Name:** Jessie Leong\n"
                     "- **Role:** Supervisor\n"
                     "- **Email:** leong.shumin@monash.edu\n"
                     "- **Phone:** +603-5516 1892")
