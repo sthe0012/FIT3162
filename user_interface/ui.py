@@ -14,6 +14,7 @@ from os.path import join
 from os.path import splitext
 import matplotlib.pyplot as plt
 from scipy.signal import resample
+from sklearn.decomposition import PCA
 
 def compute_accuracy():
     pass
@@ -82,48 +83,90 @@ def pre_processing(input):
     processed_file = np.array(processed_file)
     return processed_file
 
-def predict_inp(model, gaze_path, mexp_path, max_columns=576):
+# def predict_inp(model, gaze_path, mexp_path, max_columns=576):
     
-    # read csv
-    csv_gaze, csv_mexp = pd.read_csv(gaze_path), pd.read_csv(mexp_path)
-    # filter csv attributes
-    gaze_data_clean, mexp_data_clean = pre_processing(csv_gaze), pre_processing(csv_mexp)
-    # resample consistent samples
-    gaze_data_resampled,mexp_data_resampled = resample(gaze_data_clean, 300),resample(mexp_data_clean, 300)
-    # multimodal features (gaze, mexp)
-    combined_features = np.hstack([gaze_data_resampled, mexp_data_resampled])
+#     # read csv
+#     csv_gaze, csv_mexp = pd.read_csv(gaze_path), pd.read_csv(mexp_path)
+#     # filter csv attributes
+#     gaze_data_clean, mexp_data_clean = pre_processing(csv_gaze), pre_processing(csv_mexp)
+#     # resample consistent samples
+#     gaze_data_resampled,mexp_data_resampled = resample(gaze_data_clean, 300),resample(mexp_data_clean, 300)
+#     # multimodal features (gaze, mexp)
+#     combined_features = np.hstack([gaze_data_resampled, mexp_data_resampled])
 
-    adjusted_combined_data = {}
+#     adjusted_combined_data = {}
     
-    for key, data in combined_data.items():
-        current_columns = data.shape[1]
-        if current_columns < max_columns:
-            # Calculate how many columns to add
-            additional_columns = max_columns - current_columns
+#     for key, data in combined_data.items():
+#         current_columns = data.shape[1]
+#         if current_columns < max_columns:
+#             # Calculate how many columns to add
+#             additional_columns = max_columns - current_columns
             
-            # Create an array of NaNs to add
-            empty_columns = np.zeros((combined_features.shape[0], additional_columns))  # Change from np.nan to np.zeros
+#             # Create an array of NaNs to add
+#             empty_columns = np.zeros((combined_features.shape[0], additional_columns))  # Change from np.nan to np.zeros
             
-            # Concatenate the original data with the new empty columns
-            new_data = np.hstack([data, empty_columns])
-        else:
-            new_data = data
+#             # Concatenate the original data with the new empty columns
+#             new_data = np.hstack([data, empty_columns])
+#         else:
+#             new_data = data
 
-        # Store the adjusted data back into the dictionary
-        adjusted_combined_data[key] = new_data
+#         # Store the adjusted data back into the dictionary
+#         adjusted_combined_data[key] = new_data
 
-    # Flatten the features into a single vector
-    new_data_vector = combined_features.flatten().reshape(1, -1)
+#     # Flatten the features into a single vector
+#     new_data_vector = combined_features.flatten().reshape(1, -1)
 
-    # Check for NaN values and ensure the input data is valid
-    valid_indices = ~np.isnan(new_data_vector).any(axis=1)
-    new_data_vector_clean = new_data_vector[valid_indices]
+#     # Check for NaN values and ensure the input data is valid
+#     valid_indices = ~np.isnan(new_data_vector).any(axis=1)
+#     new_data_vector_clean = new_data_vector[valid_indices]
 
-    # Make a prediction using the trained model pipeline
-    prediction = model.predict(new_data_vector_clean)
+#     # Make a prediction using the trained model pipeline
+#     prediction = model.predict(new_data_vector_clean)
 
-    # Output the prediction
-    return 1 if prediction == 0 else 0  
+#     # Output the prediction
+#     return 1 if prediction == 0 else 0  
+
+def preprocess_data_with_pca(filepath, n_samples, expected_features):
+    data = pd.read_csv(filepath)
+    data = data.drop(columns=["Unnamed: 0", "frame", "label", "face_id", "timestamp", "confidence", "success"], errors='ignore')
+    data = data.drop_duplicates()
+
+    # Resample to a fixed number of samples
+    if len(data) > n_samples:
+        data = resample(data, n_samples)
+    elif len(data) < n_samples:
+        repeat_factor = n_samples // len(data) + 1
+        data = pd.DataFrame(np.tile(data, (repeat_factor, 1)), columns=data.columns)[:n_samples]
+
+    # PCA for dimensionality reduction if the number of features is more than expected
+    if data.shape[1] > expected_features:
+        pca = PCA(n_components=expected_features)
+        data = pca.fit_transform(data)
+    elif data.shape[1] < expected_features:
+        raise ValueError(f"Data has fewer features ({data.shape[1]}) than expected ({expected_features}).")
+
+    return data
+
+def predict_inp(gaze_filepath, mexp_filepath, svm_model, gaze_features=288, mexp_features=41):
+    # Preprocess gaze data with PCA
+    gaze_data = preprocess_data_with_pca(gaze_filepath, n_samples=300, expected_features=gaze_features)
+
+    # Preprocess microexpression data with PCA
+    mexp_data = preprocess_data_with_pca(mexp_filepath, n_samples=300, expected_features=mexp_features)
+
+    # Concatenate gaze and microexpression features
+    features = np.concatenate((gaze_data, mexp_data), axis=1).reshape(1, -1)
+
+    # Use a pre-trained SimpleImputer or ensure it is fitted with the training data
+    imputer = SimpleImputer(strategy='mean')
+    features = imputer.fit_transform(features)  # It's better to fit this with training data only
+
+    # Predict using the SVM model
+    prediction = svm_model.predict(features)
+    print(prediction)
+
+    # Return the result
+    return 'Deceptive' if prediction == 'Deceptive' else 'truthful'
 
 def count_dataset()->int:
     total = 0
