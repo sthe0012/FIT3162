@@ -13,7 +13,6 @@ from os import walk
 from os.path import join
 from os.path import splitext
 import matplotlib.pyplot as plt
-from transformers import pipeline
 from scipy.signal import resample
 
 def compute_accuracy():
