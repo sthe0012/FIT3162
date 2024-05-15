@@ -125,7 +125,8 @@ def predict_inp(svm_model, gaze_features=292, mexp_features=45):
     # Return the result
     return 'Deceptive' if prediction == 'Deceptive' else 'Truthful'
 
-# User Interface (gradio blocks)
+######################################### User Interface (UI) ##########################################################
+
 with gr.Blocks() as mcs4ui:
 
     gr.Markdown(""" # MCS4 - Securing Face ID """)
