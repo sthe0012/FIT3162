@@ -72,6 +72,43 @@ def compute_accuracy():
 
 ######################################### Deception Functions #########################################################
 
+# extract gaze features into csv file
+def extract_gaze_features(video_path):
+    #openface_cmd ="/Users/jingweiong/openFace/OpenFace/build/bin/"         # onji
+    openface_cmd ="D:\OpenFace_2.2.0_win_x64\OpenFace_2.2.0_win_x64\FeatureExtraction.exe"        # jk
+
+    # Extract the directory and filename from the video path
+    directory, filename = os.path.split(video_path)
+    base_filename = os.path.splitext(filename)[0]
+    
+    # Define the output path for the CSV
+    output_csv = os.path.join(directory, f"Gaze_{base_filename}.csv")
+
+    # Construct the command to run feature extraction with gaze tracking
+    cmd = f"{openface_cmd} -f \"{video_path}\" -out_dir \"{os.path.dirname(output_csv)}\" -of \"{output_csv}\" -gaze"
+
+    # Execute the command
+    result = os.system(cmd)
+    
+    if result == 0: print(f"Gaze data extracted successfully for {filename}, saved to {output_csv}")
+    else: print(f"Failed to extract gaze data for {filename}")
+    return output_csv
+
+# extract micro expression features into csv file
+def extract_micro_features(video_path):
+    #openface_cmd ="/Users/jingweiong/openFace/OpenFace/build/bin/"                             # onji
+    openface_cmd ="D:\OpenFace_2.2.0_win_x64\OpenFace_2.2.0_win_x64\FeatureExtraction.exe"      # jk
+
+    directory, filename = os.path.split(video_path)
+    base_filename = os.path.splitext(filename)[0]    
+    output_csv = os.path.join(directory, f"Mexp_reallifedeception_{base_filename}.csv")
+    cmd = f"{openface_cmd} -f \"{video_path}\" -out_dir \"{os.path.dirname(output_csv)}\" -of \"{output_csv}\" -pose -aus"
+    result = os.system(cmd)
+    
+    if result == 0: print(f"Mexp data extracted successfully for {filename}, saved to {output_csv}")
+    else: print(f"Failed to extract mexp data for {filename}")
+    return output_csv
+
 # get loaded model (change the CONSTANT var based on latest model trained)
 def get_model():
     model = joblib.load(CURRENT_MODEL)
@@ -100,15 +137,15 @@ def preprocess_data_with_pca(filepath, n_samples, expected_features):
     return data
 
 # prediction input function
-def predict_inp(svm_model, gaze_features=292, mexp_features=45):
+def predict_inp(video_path, svm_model, gaze_features=292, mexp_features=45):
     
     # gaze_filepath = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
     # mexp_filepath = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
+    gaze_filepath = extract_gaze_features(video_path)
+    mexp_filepath = extract_micro_features(video_path)
                 
-    # Preprocess gaze data with PCA
+    # Preprocess gaze data / microexpression data with PCA
     gaze_data = preprocess_data_with_pca(gaze_filepath, n_samples=300, expected_features=gaze_features)
-
-    # Preprocess microexpression data with PCA
     mexp_data = preprocess_data_with_pca(mexp_filepath, n_samples=300, expected_features=mexp_features)
 
     # Concatenate gaze and microexpression features
@@ -199,7 +236,7 @@ with gr.Blocks() as mcs4ui:
                 # generate csv file (mexp & gaze)
                 gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
                 mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
-                result = predict_inp(get_model())
+                result = predict_inp(video, get_model())
                 return result
         
             def ui(video):

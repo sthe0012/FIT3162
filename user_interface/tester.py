@@ -1,5 +1,6 @@
 import gradio as gr
 import time
+import os
 
 def slowly_reverse(word, progress=gr.Progress()):
     progress(0, desc="Starting")
@@ -11,9 +12,7 @@ def slowly_reverse(word, progress=gr.Progress()):
         new_string = letter + new_string
     return new_string
 
-demo = gr.Interface(slowly_reverse, gr.Text(), gr.Text())
-
-demo.launch()
+# demo = gr.Interface(slowly_reverse, gr.Text(), gr.Text())
 
 def old_predict_inp(model, gaze_path, mexp_path, max_columns=576):
     
@@ -58,8 +57,6 @@ def old_predict_inp(model, gaze_path, mexp_path, max_columns=576):
     # Output the prediction
     return 1 if prediction == 0 else 0  
 
-# above code allows to display progress bar
-
 def old_fx(video):
                 result = video_identify(video)
                 
@@ -86,3 +83,45 @@ def pre_processing(input):
     processed_file = input.drop([col for col in cols_to_drop if col in input.columns], axis=1).drop_duplicates()
     processed_file = np.array(processed_file)
     return processed_file
+
+def extract_gaze_features(video_path):
+    #openface_cmd ="/Users/jingweiong/openFace/OpenFace/build/bin/"         # onji
+    openface_cmd ="D:\OpenFace_2.2.0_win_x64\OpenFace_2.2.0_win_x64\FeatureExtraction.exe"        # jk
+
+    # Extract the directory and filename from the video path
+    directory, filename = os.path.split(video_path)
+    base_filename = os.path.splitext(filename)[0]
+    
+    # Define the output path for the CSV
+    output_csv = os.path.join(directory, f"Gaze_{base_filename}.csv")
+
+    # Construct the command to run feature extraction with gaze tracking
+    cmd = f"{openface_cmd} -f \"{video_path}\" -out_dir \"{os.path.dirname(output_csv)}\" -of \"{output_csv}\" -gaze"
+
+    # Execute the command
+    result = os.system(cmd)
+    
+    if result == 0: print(f"Gaze data extracted successfully for {filename}, saved to {output_csv}")
+    else: print(f"Failed to extract gaze data for {filename}")
+    return output_csv
+
+
+# extract micro expression features into csv file
+def extract_micro_features(video_path):
+    #openface_cmd ="/Users/jingweiong/openFace/OpenFace/build/bin/"                             # onji
+    openface_cmd ="D:\OpenFace_2.2.0_win_x64\OpenFace_2.2.0_win_x64\FeatureExtraction.exe"      # jk
+
+    directory, filename = os.path.split(video_path)
+    base_filename = os.path.splitext(filename)[0]    
+    output_csv = os.path.join(directory, f"Mexp_reallifedeception_{base_filename}.csv")
+    cmd = f"{openface_cmd} -f \"{video_path}\" -out_dir \"{os.path.dirname(output_csv)}\" -of \"{output_csv}\" -pose -aus"
+    result = os.system(cmd)
+    
+    if result == 0: print(f"Mexp data extracted successfully for {filename}, saved to {output_csv}")
+    else: print(f"Failed to extract mexp data for {filename}")
+    return output_csv
+
+# Example usage
+video_path = "D:\\fit3162\dataset\Real-life_Deception_Detection_2016\Clips\Deceptive\\trial_lie_005.mp4"
+print(extract_micro_features(video_path))
+
