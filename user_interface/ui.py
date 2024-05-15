@@ -4,21 +4,39 @@ import sys
 import glob
 import csv
 import cv2
-import time
 import joblib
 import gradio as gr
 import pandas as pd
 import numpy as np
-from os import walk
 from os.path import join
 from os.path import splitext
 import matplotlib.pyplot as plt
 from scipy.signal import resample
 from sklearn.decomposition import PCA
+from sklearn.impute import SimpleImputer
 
-def compute_accuracy():
-    pass
+CURRENT_MODEL = 'multimodal_mexp_and_gaze_02.pkl'
 
+
+######################################### Datasets Functions ##########################################################
+
+# 1. compute total training datasets distribution based on gender bias to show more datasets information
+def count_gender_distribution():
+    csv_path = r"dataset_file\\gender_bias_trial_data_results.csv" 
+    gender_bias_file = pd.read_csv(csv_path)
+    
+    # Extract gender and video count data
+    gender = gender_bias_file['Gender']
+    video_count = gender_bias_file['Video_Count']
+    
+    # Plotting the pie chart
+    fig, ax = plt.subplots()
+    ax.pie(video_count, labels=gender, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Equal aspect ratio ensures that the pie is drawn as a circle.
+    
+    return fig
+
+# 2. compute total training datasets distribution based on deceptive and truthful labels
 def count_training_distribution():
     
     csv_list = {
@@ -41,91 +59,25 @@ def count_training_distribution():
     ax.set_title('Label Distribution')
     return fig
         
-def count_gender_distribution():
-    csv_path = r"dataset_file\\gender_bias_trial_data_results.csv" 
-    gender_bias_file = pd.read_csv(csv_path)
-    
-    # Extract gender and video count data
-    gender = gender_bias_file['Gender']
-    video_count = gender_bias_file['Video_Count']
-    
-    # Plotting the pie chart
-    fig, ax = plt.subplots()
-    ax.pie(video_count, labels=gender, autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')  # Equal aspect ratio ensures that the pie is drawn as a circle.
-    
-    return fig
+# 3. compute the total training datasets amount (add up for every new datasets added)
+def count_dataset()->int:
+    total = 0
+    total += 121
+    total += 352
+    return total
 
-def old_fx(video):
-                result = video_identify(video)
-                
-                # Create the bar graph
-                plt.figure()
-                plt.bar(['Video'], [probability_of_authenticity], color='blue')
-                plt.ylim(0, 1)
-                plt.ylabel('Probability')
-                plt.title('Action Unit Trigger')
-                plt.grid(True)
-                bar_graph = plt.gcf()  # Get the current figure to return to Gradio
-                
-                # Create the line graph
-                plt.figure()
-                plt.plot(data_for_line_graph, marker='o', linestyle='-', color='red')
-                plt.title('Gaze Prediction')
-                plt.xlabel('Time')
-                plt.ylabel('Metric')
-                plt.grid(True)
-                line_graph = plt.gcf()  # Get the current figure to return to Gradio
+# 4. compute model accuracy
+def compute_accuracy():
+    return 0.6218487394957983 * 100
 
-def pre_processing(input):
-    cols_to_drop = ["frame", "Unnamed: 0", "label", "face_id", "timestamp", "confidence", "success"]
-    processed_file = input.drop([col for col in cols_to_drop if col in input.columns], axis=1).drop_duplicates()
-    processed_file = np.array(processed_file)
-    return processed_file
+######################################### Deception Functions #########################################################
 
-# def predict_inp(model, gaze_path, mexp_path, max_columns=576):
-    
-#     # read csv
-#     csv_gaze, csv_mexp = pd.read_csv(gaze_path), pd.read_csv(mexp_path)
-#     # filter csv attributes
-#     gaze_data_clean, mexp_data_clean = pre_processing(csv_gaze), pre_processing(csv_mexp)
-#     # resample consistent samples
-#     gaze_data_resampled,mexp_data_resampled = resample(gaze_data_clean, 300),resample(mexp_data_clean, 300)
-#     # multimodal features (gaze, mexp)
-#     combined_features = np.hstack([gaze_data_resampled, mexp_data_resampled])
+# get loaded model (change the CONSTANT var based on latest model trained)
+def get_model():
+    model = joblib.load(CURRENT_MODEL)
+    return model
 
-#     adjusted_combined_data = {}
-    
-#     for key, data in combined_data.items():
-#         current_columns = data.shape[1]
-#         if current_columns < max_columns:
-#             # Calculate how many columns to add
-#             additional_columns = max_columns - current_columns
-            
-#             # Create an array of NaNs to add
-#             empty_columns = np.zeros((combined_features.shape[0], additional_columns))  # Change from np.nan to np.zeros
-            
-#             # Concatenate the original data with the new empty columns
-#             new_data = np.hstack([data, empty_columns])
-#         else:
-#             new_data = data
-
-#         # Store the adjusted data back into the dictionary
-#         adjusted_combined_data[key] = new_data
-
-#     # Flatten the features into a single vector
-#     new_data_vector = combined_features.flatten().reshape(1, -1)
-
-#     # Check for NaN values and ensure the input data is valid
-#     valid_indices = ~np.isnan(new_data_vector).any(axis=1)
-#     new_data_vector_clean = new_data_vector[valid_indices]
-
-#     # Make a prediction using the trained model pipeline
-#     prediction = model.predict(new_data_vector_clean)
-
-#     # Output the prediction
-#     return 1 if prediction == 0 else 0  
-
+# pre processing with PCA
 def preprocess_data_with_pca(filepath, n_samples, expected_features):
     data = pd.read_csv(filepath)
     data = data.drop(columns=["Unnamed: 0", "frame", "label", "face_id", "timestamp", "confidence", "success"], errors='ignore')
@@ -147,7 +99,12 @@ def preprocess_data_with_pca(filepath, n_samples, expected_features):
 
     return data
 
-def predict_inp(gaze_filepath, mexp_filepath, svm_model, gaze_features=288, mexp_features=41):
+# prediction input function
+def predict_inp(svm_model, gaze_features=292, mexp_features=45):
+    
+    # gaze_filepath = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
+    # mexp_filepath = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
+                
     # Preprocess gaze data with PCA
     gaze_data = preprocess_data_with_pca(gaze_filepath, n_samples=300, expected_features=gaze_features)
 
@@ -166,18 +123,9 @@ def predict_inp(gaze_filepath, mexp_filepath, svm_model, gaze_features=288, mexp
     print(prediction)
 
     # Return the result
-    return 'Deceptive' if prediction == 'Deceptive' else 'truthful'
+    return 'Deceptive' if prediction == 'Deceptive' else 'Truthful'
 
-def count_dataset()->int:
-    total = 0
-    total += 121 
-    return total
-
-def get_model():
-    model = joblib.load('multimodal_mexp_and_gaze.pkl')
-    return model
-
-# Start building the interface with Blocks
+# User Interface (gradio blocks)
 with gr.Blocks() as mcs4ui:
 
     gr.Markdown(""" # MCS4 - Securing Face ID """)
@@ -248,13 +196,10 @@ with gr.Blocks() as mcs4ui:
             
             def video_identify(video):
                 # generate csv file (mexp & gaze)
-                gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_005.csv"
-                mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_005.csv"
-                
-                trained_model = get_model()
-                return "Deceptive!"
-                result = predict_inp(trained_model, gaze_file, mexp_file)
-                return "Truthful" if result == 0 else "Deceptive!"
+                gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
+                mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
+                result = predict_inp(get_model())
+                return result
         
             def ui(video):
                 if video is None: return "Please upload a file."
@@ -360,8 +305,6 @@ with gr.Blocks() as mcs4ui:
                     "- **Role:** Supervisor\n"
                     "- **Email:** leong.shumin@monash.edu\n"
                     "- **Phone:** +603-5516 1892")
-
-        
     
 if __name__ == '__main__':
     mcs4ui.launch()
