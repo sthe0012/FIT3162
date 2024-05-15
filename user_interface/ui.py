@@ -15,7 +15,7 @@ from scipy.signal import resample
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
 
-CURRENT_MODEL = 'multimodal_mexp_and_gaze_02.pkl'
+CURRENT_MODEL = 'multimodal_mexp_and_gaze.pkl'
 
 
 ######################################### Datasets Functions ##########################################################
@@ -68,7 +68,7 @@ def count_dataset()->int:
 
 # 4. compute model accuracy
 def compute_accuracy():
-    return 0.6218487394957983 * 100
+    return 0.6526315789473685 * 100
 
 ######################################### Deception Functions #########################################################
 
