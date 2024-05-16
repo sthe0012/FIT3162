@@ -14,9 +14,26 @@ import matplotlib.pyplot as plt
 from scipy.signal import resample
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
+from moviepy.editor import VideoFileClip
 
 CURRENT_MODEL = 'multimodal_mexp_and_gaze_02.pkl'
 
+######################################### Helper Functions ##########################################################
+
+# mp4 convertor
+def convert_mov_to_mp4(mov_file_path):
+    # Extract directory and filename without extension
+    directory = os.path.dirname(mov_file_path)
+    file_name = os.path.splitext(os.path.basename(mov_file_path))[0]
+    output_mp4_file_path = os.path.join(directory, file_name + '.mp4')
+    
+    # Convert the video file
+    video_clip = VideoFileClip(mov_file_path)
+    video_clip.write_videofile(output_mp4_file_path, codec='libx264')
+    video_clip.close()
+    
+    print("the new path of mp4 file is "+str(video_clip))
+    return output_mp4_file_path
 
 ######################################### Datasets Functions ##########################################################
 
@@ -158,9 +175,60 @@ def predict_inp(video_path, svm_model, gaze_features=292, mexp_features=45):
     # Predict using the SVM model
     prediction = svm_model.predict(features)
     print(prediction)
-
+    
+    # extract top 5 facial action units
+    au_output = top5_au(mexp_filepath)
+    facial_au_list = ""
+    for i in range(len(au_output)-1):
+        facial_au_list = facial_au_list + au_output[i] + ", "
+    facial_au_list += au_output[-1]
+    
     # Return the result
-    return 'Deceptive' if prediction == 'Deceptive' else 'Truthful'
+    if prediction == 'Deceptive': return 'DECEPTIVE', facial_au_list
+    return 'TRUTHFUL', facial_au_list
+
+############################################ FAU Functions #############################################################
+
+def check_au_presence(row, au_columns):
+    present_aus = []
+    for au in au_columns:
+        if row[au] == 1: present_aus.append(au)
+    return present_aus
+
+def top5_au(path):
+    dic = {' AU04_c': 'Brow Lowerer',
+           ' AU12_c': 'Lip Corner Puller',
+           ' AU14_c': 'Dimpler',
+           ' AU10_c': 'Upper Lip Raiser',
+           ' AU05_c': 'Upper Lid Raiser',
+           ' AU07_c': 'Lid Tightener',
+           ' AU06_c': 'Cheek Raiser',
+           ' AU23_c': 'Lip Tightener',
+           ' AU17_c': 'Chin Raiser',
+           ' AU15_c': 'Lip Corner Depressor',
+           ' AU45_c': 'Blink',
+           ' AU02_c': 'Outer Brow Raiser',
+           ' AU25_c': 'Lips part',
+           ' AU20_c': 'Lip stretcher',
+           ' AU01_c': 'Inner Brow Raiser',
+           ' AU26_c': 'Jaw Drop',
+           ' AU09_c': 'Nose Wrinkler',
+           ' AU28_c': 'Lip Suck'}
+
+    au_columns = [' AU04_c', ' AU12_c', ' AU14_c', ' AU10_c', ' AU05_c', ' AU07_c', ' AU06_c', ' AU23_c', ' AU17_c',
+                  ' AU15_c', ' AU45_c', ' AU02_c', ' AU25_c', ' AU20_c', ' AU01_c', ' AU26_c', ' AU09_c', ' AU28_c']
+    au_counts = {au: 0 for au in au_columns}
+
+    data = pd.read_csv(path)
+    for index, row in data.iterrows():
+        present_aus = check_au_presence(row, au_columns)
+        for au in present_aus:
+            au_counts[au] += 1
+
+    sorted_au_counts = sorted(au_counts.items(), key=lambda item: item[1], reverse=True)
+    top5_aus = [dic[au] for au, count in sorted_au_counts[:5]]
+
+    return top5_aus
 
 ######################################### User Interface (UI) ##########################################################
 
@@ -234,20 +302,26 @@ with gr.Blocks() as mcs4ui:
             
             def video_identify(video):
                 # generate csv file (mexp & gaze)
-                gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
-                mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
+                #gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
+                #mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
                 result = predict_inp(video, get_model())
                 return result
         
             def ui(video):
                 if video is None: return "Please upload a file."
-                elif not video.lower().endswith('.mp4'): return "Please upload a file with file type MP4 strictly"
+                elif not video.lower().endswith('.mp4'): 
+                    
+                    if video.lower().endswith('.mov'): 
+                        video_new_path = convert_mov_to_mp4(video)
+                        return video_identify(video_new_path)
+                    else: return "Please upload a file with file type MP4 strictly"
+                    
                 else: return video_identify(video)
 
             combined_ui = gr.Interface(
                     fn=ui,
                     inputs=gr.Video(),
-                    outputs=["text"],
+                    outputs=["text", "text"],
                     title="Deception Detection System",
                     description="Displays the result of the input video to identify authenticity."
             )

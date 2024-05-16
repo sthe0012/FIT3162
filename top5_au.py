@@ -3,8 +3,7 @@ import pandas as pd
 def check_au_presence(row, au_columns):
     present_aus = []
     for au in au_columns:
-        if row[au] == 1:
-            present_aus.append(au)
+        if row[au] == 1: present_aus.append(au)
     return present_aus
 
 def top5_au(path):
