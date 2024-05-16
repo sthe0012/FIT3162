@@ -20,6 +20,27 @@ CURRENT_MODEL = 'multimodal_mexp_and_gaze_02.pkl'
 
 ######################################### Helper Functions ##########################################################
 
+# face detector
+def detect_face(video_path):
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    cap = cv2.VideoCapture(video_path)
+    face_detected = False
+    while True:
+        ret, frame = cap.read()
+        if not ret: break  # Break the loop if there are no frames left
+        # Convert frame to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Detect faces in the frame
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4)
+        # Check if any faces are detected
+        if len(faces) > 0:
+            face_detected = True
+            break  # Exit loop if a face is detected
+
+    cap.release()
+    return face_detected
+
 # mp4 convertor
 def convert_mov_to_mp4(mov_file_path):
     # Extract directory and filename without extension
@@ -301,22 +322,28 @@ with gr.Blocks() as mcs4ui:
         with gr.Tab("Video Analysis"):
             
             def video_identify(video):
-                # generate csv file (mexp & gaze)
                 #gaze_file = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
                 #mexp_file = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
                 result = predict_inp(video, get_model())
                 return result
         
             def ui(video):
-                if video is None: return "Please upload a file."
+                if video is None: 
+                    return "Please upload a file.", ""
+                
                 elif not video.lower().endswith('.mp4'): 
-                    
                     if video.lower().endswith('.mov'): 
                         video_new_path = convert_mov_to_mp4(video)
                         return video_identify(video_new_path)
-                    else: return "Please upload a file with file type MP4 strictly"
+                    else: return "Please upload a file with file type MP4 strictly", ""
                     
-                else: return video_identify(video)
+                else: 
+                    validate_face = detect_face(video)
+                    print("VALIDATE AH"+str(validate_face))
+                    if validate_face:
+                        return video_identify(video)
+                    else:
+                        return "Facial input is not found in video.", "Please try again."
 
             combined_ui = gr.Interface(
                     fn=ui,
