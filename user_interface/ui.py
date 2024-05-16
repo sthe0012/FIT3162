@@ -15,7 +15,7 @@ from scipy.signal import resample
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
 
-CURRENT_MODEL = 'multimodal_mexp_and_gaze.pkl'
+CURRENT_MODEL = 'multimodal_mexp_and_gaze_02.pkl'
 
 
 ######################################### Datasets Functions ##########################################################
