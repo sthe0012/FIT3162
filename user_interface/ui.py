@@ -16,7 +16,7 @@ from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
 from moviepy.editor import VideoFileClip
 
-CURRENT_MODEL = 'multimodal_mexp_and_gaze_02.pkl'
+CURRENT_MODEL = 'multimodal_mexp_and_gaze_03.pkl'
 
 ######################################### Helper Functions ##########################################################
 
@@ -205,7 +205,7 @@ def predict_inp(video_path, svm_model, gaze_features=292, mexp_features=45):
     facial_au_list += au_output[-1]
     
     # Return the result
-    if prediction == 'Deceptive': return 'DECEPTIVE', facial_au_list
+    if prediction[0] == 'Deceptive': return 'DECEPTIVE', facial_au_list
     return 'TRUTHFUL', facial_au_list
 
 ############################################ FAU Functions #############################################################
@@ -338,12 +338,13 @@ with gr.Blocks() as mcs4ui:
                     else: return "Please upload a file with file type MP4 strictly", ""
                     
                 else: 
-                    validate_face = detect_face(video)
-                    print("VALIDATE AH"+str(validate_face))
-                    if validate_face:
-                        return video_identify(video)
-                    else:
-                        return "Facial input is not found in video.", "Please try again."
+                    return video_identify(video)
+                    # validate_face = detect_face(video)
+                    # print("VALIDATE AH"+str(validate_face))
+                    # if validate_face:
+                        #return video_identify(video)
+                    # else:
+                    #     return "Facial input is not found in video.", "Please try again."
 
             combined_ui = gr.Interface(
                     fn=ui,
