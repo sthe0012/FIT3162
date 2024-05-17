@@ -154,7 +154,7 @@ def get_model():
 
 # pre processing with PCA
 def preprocess_data_with_pca(filepath, n_samples, expected_features):
-    data = pd.read_csv(filepath)
+    data = pd.read_csv(filepath)    
     data = data.drop(columns=["Unnamed: 0", "frame", "label", "face_id", "timestamp", "confidence", "success"], errors='ignore')
     data = data.drop_duplicates()
     # Resample to a fixed number of samples
@@ -178,12 +178,24 @@ def predict_inp(video_path, svm_model, gaze_features=292, mexp_features=45):
     
     # gaze_filepath = r"D:\\fit3162\\dataset\\output_gaze\\Gaze_reallifedeception_trial_lie_042.csv"
     # mexp_filepath = r"D:\\fit3162\\dataset\\output_micro_expression\\Mexp_reallifedeception_trial_lie_042.csv"
+    
     gaze_filepath = extract_gaze_features(video_path)
     mexp_filepath = extract_micro_features(video_path)
+
+    # exxx = pd.read_csv(gaze_filepath)
+    # print(exxx.columns)
                 
     # Preprocess gaze data / microexpression data with PCA
     gaze_data = preprocess_data_with_pca(gaze_filepath, n_samples=300, expected_features=gaze_features)
     mexp_data = preprocess_data_with_pca(mexp_filepath, n_samples=300, expected_features=mexp_features)
+    
+    if (gaze_data[' confidence'] == 0).all():
+        print("All elements in the 'confidence' column are equal to 0")
+        return "Facial input is not detected", "Please try again"
+
+    if (mexp_data[' confidence'] == 0).all():
+        print("All elements in the 'confidence' column are equal to 0")
+        return "Facial input is not detected", "Please try again"
 
     # Concatenate gaze and microexpression features
     features = np.concatenate((gaze_data, mexp_data), axis=1).reshape(1, -1)

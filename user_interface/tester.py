@@ -1,4 +1,5 @@
 import gradio as gr
+import pandas as pd
 import time
 import os
 
@@ -122,6 +123,22 @@ def extract_micro_features(video_path):
     return output_csv
 
 # Example usage
-video_path = "D:\\fit3162\dataset\Real-life_Deception_Detection_2016\Clips\Deceptive\\trial_lie_005.mp4"
-print(extract_micro_features(video_path))
+# video_path = "D:\\fit3162\dataset\Real-life_Deception_Detection_2016\Clips\Deceptive\\trial_lie_005.mp4"
+# print(extract_micro_features(video_path))
 
+
+
+def main():
+    doggo_path = "dataset_file\doggo_output.csv"
+    df = pd.read_csv(doggo_path)
+    # Print the type of the 'confidence' column
+    print(type(df['confidence']))
+
+    # Check if all values in the 'confidence' column are equal to 0 or 0.0
+    if (df['confidence'] == 0).all():
+        print("All elements in the 'confidence' column are equal to 0")
+    else:
+        print("Not all elements in the 'confidence' column are equal to 0")
+
+if __name__ == '__main__':
+    main()
