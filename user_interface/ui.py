@@ -186,6 +186,10 @@ def predict_inp(video_path, svm_model, gaze_features=292, mexp_features=45):
     gaze_data = preprocess_data_with_pca(gaze_filepath, n_samples=300, expected_features=gaze_features)
     mexp_data = preprocess_data_with_pca(mexp_filepath, n_samples=300, expected_features=mexp_features)
 
+    if 'confidence' in gaze_data.columns and (gaze_data['confidence'] == 0).all():
+        print("No Human Face detected in input video")
+        return "No Human Face detected in input video", ""
+        
     # Concatenate gaze and microexpression features
     features = np.concatenate((gaze_data, mexp_data), axis=1).reshape(1, -1)
 
